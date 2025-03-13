@@ -1,0 +1,51 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <link rel="stylesheet" th:href="~{/css/styles.css}">
+</head>
+<body>
+1. Вывод текста(затирает то что внутри)
+<h1 th:text="${message}">Hello world!!</h1>
+
+2. Вывод текста но не затирает
+<h1 th:inline="text"> This is my message--> [[${message}]] <-- text! </h1>
+<h1></h1>
+
+3. Обход циклом
+<ul th:each="one:${message}">
+    <h1 th:text="${one}"/>
+</ul>
+
+4. if else
+<div th:if="${boolValue}">
+    boolValue TRUE!!
+</div>
+<div th:unless="${boolValue}">
+    boolValue FALSE!!
+</div>
+
+5.Switch
+<div th:switch="${role.name()}"> 
+    <div th:case="ADMIN">THIS IS ADMIN</div>
+    <div th:case="USER">THIS IS USER</div>
+    <div th:case="*">IDK :(</div>
+</div>
+
+6. Вывод полей через $
+<h1>User information:</h1>
+<p th:inline="text">Id: [[${user.id}]]</p>
+<p th:inline="text">First name: [[${user.firstname}]]</p>
+<p th:inline="text">Age: [[${user.age}]]</p>
+
+7. Вывод полей через *
+
+<div th:object="${user}">
+    <h1>User information:</h1>
+    <p th:inline="text">Id: [[*{id}]]</p>
+    <p th:inline="text">First name: [[*{firstname}]]</p>
+    <p th:inline="text">Age: [[*{age}]]</p>
+</div>
+
+</body>
+</html>

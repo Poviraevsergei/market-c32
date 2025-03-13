@@ -43,7 +43,7 @@ public class SecurityController {
                 System.out.println(error);
             }
             System.out.println(bindingResult.getAllErrors());
-            return "registration";
+            return "registration"; //TODO: Freemarker Model Exc
         }
 
         Boolean result = securityService.registration(requestDto);

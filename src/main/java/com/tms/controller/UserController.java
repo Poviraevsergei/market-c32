@@ -31,8 +31,8 @@ public class UserController {
         return "createUser";
     }
 
-    @GetMapping
-    public String getUserUpdatePage(@RequestParam("userId") Long userId, Model model, HttpServletResponse response) {
+    @GetMapping("/update-page/{id}")
+    public String getUserUpdatePage(@PathVariable("id") Long userId, Model model, HttpServletResponse response) {
         Optional<User> user = userService.getUserById(userId);
         if (user.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND); //404
@@ -85,8 +85,8 @@ public class UserController {
     }
 
     //Delete
-    @PostMapping("/delete")
-    public String deleteUser(@RequestParam("userId") Long userId, Model model, HttpServletResponse response) {
+    @PostMapping("/delete/{id}")
+    public String deleteUser(@PathVariable("id") Long userId, Model model, HttpServletResponse response) {
         Optional<User> userDeleted = userService.deleteUser(userId);
         if (userDeleted.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_CONFLICT);
