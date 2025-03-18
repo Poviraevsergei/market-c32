@@ -3,6 +3,7 @@ package com.tms.repository;
 import com.tms.config.DatabaseService;
 import com.tms.config.SQLQuery;
 import com.tms.model.Role;
+import com.tms.model.Security;
 import com.tms.model.dto.RegistrationRequestDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -13,6 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.Optional;
 
 @Repository
 public class SecurityRepository {
@@ -59,6 +61,24 @@ public class SecurityRepository {
         } catch (Exception e) {
             System.out.println(e.getMessage());
             connection.rollback();
+        }
+        return false;
+    }
+
+    public Boolean isLoginUsed(String login) throws SQLException {
+        Connection connection = databaseService.getConnection();
+        try {
+            PreparedStatement createUserStatement = connection.prepareStatement(SQLQuery.GET_SECURITY_BY_LOGIN);
+            createUserStatement.setString(1, login);
+            ResultSet resultSet = createUserStatement.executeQuery();
+            while (resultSet.next()) {
+                if (resultSet.getString("login").equals(login)) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return false;
         }
         return false;
     }

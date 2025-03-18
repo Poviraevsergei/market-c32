@@ -1,22 +1,18 @@
 package com.tms.controller;
 
-import com.tms.exception.AgeException;
 import com.tms.model.dto.RegistrationRequestDto;
 import com.tms.service.SecurityService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Objects;
-
-@Controller
+@RestController
 @RequestMapping("/security")
 public class SecurityController {
 
@@ -27,26 +23,13 @@ public class SecurityController {
         this.securityService = securityService;
     }
 
-    @GetMapping("/registration")
-    public String registration() {
-        return "registration";
-    }
-
     @PostMapping("/registration")
-    public String registration(@ModelAttribute @Valid RegistrationRequestDto requestDto,
-                               BindingResult bindingResult) {
+    public ResponseEntity<HttpStatus> registration(@RequestBody @Valid RegistrationRequestDto requestDto,
+                                                   BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            for (ObjectError error : bindingResult.getAllErrors()) {
-                if (Objects.equals(error.getCode(), "CustomAge")) {
-                    throw new AgeException(error.getDefaultMessage());
-                }
-                System.out.println(error);
-            }
-            System.out.println(bindingResult.getAllErrors());
-            return "registration"; //TODO: Freemarker Model Exc
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-
         Boolean result = securityService.registration(requestDto);
-        return "user";
+        return new ResponseEntity<>(result ? HttpStatus.CREATED : HttpStatus.CONFLICT);
     }
 }

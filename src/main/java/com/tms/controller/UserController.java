@@ -2,20 +2,21 @@ package com.tms.controller;
 
 import com.tms.model.User;
 import com.tms.service.UserService;
-import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 
-@Controller
+@RestController
 @RequestMapping("/user")
 public class UserController {
 
@@ -25,76 +26,40 @@ public class UserController {
     public UserController(UserService userService) {
         this.userService = userService;
     }
-
-    @GetMapping("/create")
-    public String getUserCreatePage() {
-        return "createUser";
-    }
-
-    @GetMapping("/update-page/{id}")
-    public String getUserUpdatePage(@PathVariable("id") Long userId, Model model, HttpServletResponse response) {
-        Optional<User> user = userService.getUserById(userId);
-        if (user.isEmpty()) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND); //404
-            model.addAttribute("message", "User not found: id=" + userId);
-            return "innerError";
-        }
-        model.addAttribute("user", user.get());
-        return "edit";
-    }
-
-    //Create
-    @PostMapping("/create")
-    public String createUser(@ModelAttribute("user") User user, HttpServletResponse response, Model model) {
+    
+    @PostMapping
+    public ResponseEntity<User> createUser(@RequestBody User user) {
         Optional<User> createdUser = userService.createUser(user);
         if (createdUser.isEmpty()) {
-            response.setStatus(HttpServletResponse.SC_CONFLICT);
-            model.addAttribute("message", "User not created");
-            return "innerError";
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        model.addAttribute("user", createdUser.get());
-        return "user";
+        return new ResponseEntity<>(createdUser.get(), HttpStatus.CREATED);
     }
-
-    //Read
+    
     @GetMapping("/{id}")
-    public String getUserById(@PathVariable("id") Long id, Model model, HttpServletResponse response) {
+    public ResponseEntity<User> getUserById(@PathVariable("id") Long id) {
         Optional<User> user = userService.getUserById(id);
         if (user.isEmpty()) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND); //404
-            model.addAttribute("message", "User not found: id=" + id);
-            return "innerError";
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-        response.setStatus(HttpServletResponse.SC_OK); //200
-        model.addAttribute("user", user.get());
-        return "user";
+        return new ResponseEntity<>(user.get(), HttpStatus.OK);
     }
-
-    //Update
-    @PostMapping
-    public String updateUser(@ModelAttribute("user") User user, Model model, HttpServletResponse response) {
+    
+    @PutMapping
+    public ResponseEntity<User> updateUser(@RequestBody User user) {
         Optional<User> userUpdated = userService.updateUser(user);
         if (userUpdated.isEmpty()) {
-            response.setStatus(HttpServletResponse.SC_CONFLICT);
-            model.addAttribute("message", "User not updated.");
-            return "innerError";
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        response.setStatus(HttpServletResponse.SC_OK);
-        model.addAttribute("user", userUpdated.get());
-        return "user";
+        return new ResponseEntity<>(userUpdated.get(), HttpStatus.OK);
     }
 
-    //Delete
-    @PostMapping("/delete/{id}")
-    public String deleteUser(@PathVariable("id") Long userId, Model model, HttpServletResponse response) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<HttpStatus> deleteUser(@PathVariable("id") Long userId) {
         Optional<User> userDeleted = userService.deleteUser(userId);
         if (userDeleted.isEmpty()) {
-            response.setStatus(HttpServletResponse.SC_CONFLICT);
-            model.addAttribute("message", "User not deleted.");
-            return "innerError";
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        response.setStatus(HttpServletResponse.SC_OK);
-        model.addAttribute("user", userDeleted.get());
-        return "user";
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

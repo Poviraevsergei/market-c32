@@ -19,6 +19,9 @@ public class SecurityService {
     
     public Boolean registration(RegistrationRequestDto requestDto) {
         try {
+            if (securityRepository.isLoginUsed(requestDto.getLogin())){
+                return false;
+            }
             return securityRepository.registration(requestDto);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
