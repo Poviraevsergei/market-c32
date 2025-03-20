@@ -2,6 +2,9 @@ package com.tms.controller;
 
 import com.tms.model.User;
 import com.tms.service.UserService;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +30,10 @@ public class UserController {
         this.userService = userService;
     }
     
+    @ApiResponses(value = {
+            @ApiResponse(description = "When user created.", responseCode = "201"),
+            @ApiResponse(description = "When something wrong.", responseCode = "409")
+    })
     @PostMapping
     public ResponseEntity<User> createUser(@RequestBody User user) {
         Optional<User> createdUser = userService.createUser(user);
@@ -37,7 +44,7 @@ public class UserController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable("id") Long id) {
+    public ResponseEntity<User> getUserById(@PathVariable("id") @Parameter(description = "User id") Long id) {
         Optional<User> user = userService.getUserById(id);
         if (user.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -55,7 +62,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteUser(@PathVariable("id") Long userId) {
+    public ResponseEntity<HttpStatus> deleteUser(@PathVariable("id") @Parameter(description = "User id") Long userId) {
         Optional<User> userDeleted = userService.deleteUser(userId);
         if (userDeleted.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);

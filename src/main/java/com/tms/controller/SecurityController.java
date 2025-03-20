@@ -2,6 +2,7 @@ package com.tms.controller;
 
 import com.tms.model.dto.RegistrationRequestDto;
 import com.tms.service.SecurityService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ public class SecurityController {
         this.securityService = securityService;
     }
 
+    @Operation(summary = "User registration", description = "Endpoint allows to register a new user. Checks validation. In the database creates 2 new models related to each other (User, Security)")
     @PostMapping("/registration")
     public ResponseEntity<HttpStatus> registration(@RequestBody @Valid RegistrationRequestDto requestDto,
                                                    BindingResult bindingResult) {

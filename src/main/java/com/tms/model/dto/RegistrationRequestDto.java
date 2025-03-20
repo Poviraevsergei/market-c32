@@ -1,6 +1,7 @@
 package com.tms.model.dto;
 
 import com.tms.annotation.CustomAge;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -8,6 +9,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.springframework.stereotype.Component;
 
+@Schema(description = "RegistrationDTO")
 @Component
 public class RegistrationRequestDto {
     @NotNull
@@ -99,27 +101,4 @@ public class RegistrationRequestDto {
     public void setPassword(String password) {
         this.password = password;
     }
-
-    //@Null
-    //@NotNull
-    //@NotEmpty
-    //@NotBlank
-    //@AssertTrue
-    //@AssertFalse
-    //@Email
-    //@Pattern(regexp ="[A-z]{5}")
-    //@Size(min=2,max=10)
-    //@Max(10)
-    //@Min(10)
-    //@DecimalMax
-    //@DecimalMin
-    //@Digits(integer=3, fraction=3)
-    //@Negative
-    //@NegativeOrZero
-    //@Positive
-    //@PositiveOrZero
-    //@Future
-    //@FutureOrPresent
-    //@Past
-    //@PastOrPresent
 }
