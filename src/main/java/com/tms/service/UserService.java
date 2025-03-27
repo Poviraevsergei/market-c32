@@ -5,6 +5,7 @@ import com.tms.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.Optional;
 
 @Service
@@ -22,26 +23,16 @@ public class UserService {
     }
 
     public Optional<User> updateUser(User user){
-        Boolean result = userRepository.updateUser(user);
-        if(result){
-            return getUserById(user.getId());
-        }
-        return Optional.empty();
+        user.setUpdated(new Timestamp(System.currentTimeMillis()));
+        return userRepository.updateUser(user);
     }
 
-    public Optional<User> deleteUser(Long id){
-        Boolean result = userRepository.deleteUser(id);
-        if(result){
-            return getUserById(id);
-        }
-        return Optional.empty();
+    public Boolean deleteUser(Long id){
+        return userRepository.deleteUser(id);
     }
     
-    public Optional<User> createUser(User user){
-        Optional<Long> userId = userRepository.createUser(user);
-        if(userId.isPresent()){
-            return getUserById(userId.get());
-        }
-        return Optional.empty();
+    public Boolean createUser(User user){
+        user.setDeleted(false);
+        return userRepository.createUser(user);
     }
 }

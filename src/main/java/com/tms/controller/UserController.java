@@ -35,12 +35,12 @@ public class UserController {
             @ApiResponse(description = "When something wrong.", responseCode = "409")
     })
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        Optional<User> createdUser = userService.createUser(user);
-        if (createdUser.isEmpty()) {
+    public ResponseEntity<HttpStatus> createUser(@RequestBody User user) {
+        Boolean result = userService.createUser(user);
+        if (!result) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
-        return new ResponseEntity<>(createdUser.get(), HttpStatus.CREATED);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
     
     @GetMapping("/{id}")
@@ -63,8 +63,8 @@ public class UserController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<HttpStatus> deleteUser(@PathVariable("id") @Parameter(description = "User id") Long userId) {
-        Optional<User> userDeleted = userService.deleteUser(userId);
-        if (userDeleted.isEmpty()) {
+        Boolean result = userService.deleteUser(userId);
+        if (!result) {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

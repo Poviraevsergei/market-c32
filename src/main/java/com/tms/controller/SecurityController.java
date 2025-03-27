@@ -1,5 +1,7 @@
 package com.tms.controller;
 
+import com.tms.exception.LoginUsedException;
+import com.tms.model.User;
 import com.tms.model.dto.RegistrationRequestDto;
 import com.tms.service.SecurityService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/security")
@@ -26,12 +30,15 @@ public class SecurityController {
 
     @Operation(summary = "User registration", description = "Endpoint allows to register a new user. Checks validation. In the database creates 2 new models related to each other (User, Security)")
     @PostMapping("/registration")
-    public ResponseEntity<HttpStatus> registration(@RequestBody @Valid RegistrationRequestDto requestDto,
-                                                   BindingResult bindingResult) {
+    public ResponseEntity<User> registration(@RequestBody @Valid RegistrationRequestDto requestDto,
+                                             BindingResult bindingResult) throws LoginUsedException {
         if (bindingResult.hasErrors()) {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        Boolean result = securityService.registration(requestDto);
-        return new ResponseEntity<>(result ? HttpStatus.CREATED : HttpStatus.CONFLICT);
+        Optional<User> user = securityService.registration(requestDto);
+        if (user.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+        return new ResponseEntity<>(user.get(), HttpStatus.CREATED);
     }
 }

@@ -1,8 +1,13 @@
 package com.tms.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Transient;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -10,17 +15,42 @@ import java.sql.Timestamp;
 
 @Scope("prototype")
 @Component
+@Entity(name = "users")
 public class User {
+    @Id
+    @SequenceGenerator(name = "user_seq_gen", sequenceName = "users_id_seq", allocationSize = 1)
+    @GeneratedValue(generator = "user_seq_gen")
     private Long id;
     private String firstname;
+    @Column(name = "second_name")
     private String secondName;
     private Integer age;
     private String email;
     private String sex;
+    
+    @Column(name = "telephone_number")
     private String telephoneNumber;
+
+    @Column(name = "created", updatable = false)
     private Timestamp created;
+
+    @Column(name = "updated", insertable = false)
     private Timestamp updated;
+
+    @PrePersist
+    protected void onCreate() {
+        created = new Timestamp(System.currentTimeMillis());
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updated = new Timestamp(System.currentTimeMillis());
+    }
+
+    @Column(name = "is_deleted")
     private Boolean isDeleted;
+    
+    @Transient
     private Security securityInfo;
 
     @Override

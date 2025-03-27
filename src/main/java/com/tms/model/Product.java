@@ -1,19 +1,21 @@
 package com.tms.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
 
 @Scope("prototype")
-@AllArgsConstructor
-@NoArgsConstructor
-@Data
 @Component
+@Entity(name = "product")
 public class Product {
+    @Id
+    @SequenceGenerator(name = "prod_seq_gen", sequenceName = "product_id_seq", allocationSize = 1)
+    @GeneratedValue(generator = "prod_seq_gen")
     private Integer id;
     private String name;
     private Double price;

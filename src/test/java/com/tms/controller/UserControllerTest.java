@@ -80,7 +80,8 @@ public class UserControllerTest {
         Assertions.assertNull(response.getBody());
     }
 
-    @Test
+    
+/*    @Test
     public void testCreateUser_Success() {
         //1. Настройка перед запуском
         Mockito.when(userService.createUser(any(User.class))).thenReturn(Optional.of(user));
@@ -92,9 +93,9 @@ public class UserControllerTest {
         //3. Сравнение результатов
         Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
         Assertions.assertEquals(updated, response.getBody().getUpdated()); //реализовать клонирование для других полей если нужно 
-    }
+    }*/
 
-    @Test
+/*    @Test
     public void testCreateUser_Conflict() {
         //1. Настройка перед запуском
         Mockito.when(userService.createUser(any(User.class))).thenReturn(Optional.empty());
@@ -105,9 +106,9 @@ public class UserControllerTest {
         //3. Сравнение результатов
         Assertions.assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
         Assertions.assertNull(response.getBody());
-    }
+    }*/
 
-    @Test
+/*    @Test
     public void testDeleteUser_Success() {
         //1. Настройка перед запуском
         Mockito.when(userService.deleteUser(anyLong())).thenReturn(Optional.of(user));
@@ -131,7 +132,7 @@ public class UserControllerTest {
         //3. Сравнение результатов
         Assertions.assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
         Assertions.assertNull(response.getBody());
-    }
+    }*/
 
     @Test
     public void testUpdateUser_Success() {

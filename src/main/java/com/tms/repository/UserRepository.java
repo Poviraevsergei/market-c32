@@ -1,116 +1,68 @@
 package com.tms.repository;
 
-import com.tms.config.DatabaseService;
-import com.tms.config.SQLQuery;
+
+import com.tms.interceptor.LogInterceptor;
 import com.tms.model.User;
+import jakarta.persistence.EntityManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.Optional;
 
 @Repository
 public class UserRepository {
-
-    private final DatabaseService databaseService;
+    
+    public final EntityManager entityManager;
+    private static final Logger log = LoggerFactory.getLogger(UserRepository.class);
 
     @Autowired
-    public UserRepository(DatabaseService databaseService) {
-        this.databaseService = databaseService;
+    public UserRepository(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
     public Optional<User> getUserById(Long id) {
-        Connection connection = databaseService.getConnection();
-
-        try {
-            PreparedStatement getUserStatement = connection.prepareStatement(SQLQuery.GET_USER_BY_ID);
-            getUserStatement.setLong(1, id);
-            ResultSet resultSet = getUserStatement.executeQuery();
-            return parseUser(resultSet);
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return Optional.empty();
-        }
+        return Optional.of(entityManager.find(User.class, id));
     }
-    
-    public Boolean deleteUser(Long id){
-        Connection connection = databaseService.getConnection();
+
+    public Boolean deleteUser(Long id) {
         try {
-            PreparedStatement getUserStatement = connection.prepareStatement(SQLQuery.DELETE_USER);
-            getUserStatement.setLong(1, id);
-            return getUserStatement.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
+            entityManager.getTransaction().begin();
+            entityManager.remove(entityManager.find(User.class, id));
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            entityManager.getTransaction().rollback();
+            log.error(e.getMessage());
             return false;
         }
+        return true;
     }
-    
-    public Optional<Long> createUser(User user){
-        Connection connection = databaseService.getConnection();
-        Long userId = null;
+
+    public Boolean createUser(User user) {
+        try {
+            entityManager.getTransaction().begin();
+            entityManager.persist(user); 
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            entityManager.getTransaction().rollback();
+            log.error(e.getMessage());
+            return false;
+        }
+        return true;
+    }
+
+    public Optional<User> updateUser(User user) {
+        User userUpdated = null;
         
         try {
-            PreparedStatement createUserStatement = connection.prepareStatement(SQLQuery.CREATE_USER, Statement.RETURN_GENERATED_KEYS);
-            createUserStatement.setString(1, user.getFirstname());
-            createUserStatement.setString(2, user.getSecondName());
-            createUserStatement.setInt(3, user.getAge());
-            createUserStatement.setString(4, user.getTelephoneNumber());
-            createUserStatement.setString(5, user.getEmail());
-            createUserStatement.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
-            createUserStatement.setString(7, user.getSex());
-            createUserStatement.setBoolean(8, false);
-            createUserStatement.executeUpdate();
-            
-            ResultSet generatedKeys = createUserStatement.getGeneratedKeys();
-            if (generatedKeys.next()) {
-                userId = generatedKeys.getLong(1);
-            }
-            return Optional.of(userId);
-        } catch (SQLException e){
-            System.out.println(e.getMessage());
-            return Optional.empty();
+            entityManager.getTransaction().begin();
+            userUpdated = entityManager.merge(user);
+            entityManager.getTransaction().commit();
+        } catch (Exception e) {
+            entityManager.getTransaction().rollback();
+            log.error(e.getMessage());
         }
-    }
-
-    public Boolean updateUser(User user) {
-        Connection connection = databaseService.getConnection();
-
-        try {
-            PreparedStatement getUserStatement = connection.prepareStatement(SQLQuery.UPDATE_USER);
-            getUserStatement.setString(1, user.getFirstname());
-            getUserStatement.setString(2, user.getSecondName());
-            getUserStatement.setInt(3, user.getAge());
-            getUserStatement.setString(4, user.getTelephoneNumber());
-            getUserStatement.setString(5, user.getEmail());
-            getUserStatement.setString(6, user.getSex());
-            getUserStatement.setLong(7, user.getId());
-            return getUserStatement.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return false;
-        }
-    }
-
-    private Optional<User> parseUser(ResultSet resultSet) throws SQLException {
-        if (resultSet.next()) {
-            User user = new User();
-            user.setId(resultSet.getLong("id"));
-            user.setFirstname(resultSet.getString("firstname"));
-            user.setSecondName(resultSet.getString("second_name"));
-            user.setAge(resultSet.getInt("age"));
-            user.setTelephoneNumber(resultSet.getString("telephone_number"));
-            user.setEmail(resultSet.getString("email"));
-            user.setCreated(resultSet.getTimestamp("created"));
-            user.setUpdated(resultSet.getTimestamp("updated"));
-            user.setSex(resultSet.getString("sex"));
-            user.setDeleted(resultSet.getBoolean("is_deleted"));
-            return Optional.of(user);
-        }
-        return Optional.empty();
+        return Optional.of(userUpdated);
     }
 }

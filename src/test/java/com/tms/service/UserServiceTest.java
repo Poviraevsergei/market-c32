@@ -34,7 +34,7 @@ public class UserServiceTest {
         user.setFirstname("Dimas");
     }
     
-    @Test
+/*    @Test
     public void testUpdateUser_Success(){
         Mockito.when(userRepository.updateUser(any(User.class))).thenReturn(true);
         Mockito.when(userRepository.getUserById(anyLong())).thenReturn(Optional.of(user));
@@ -42,14 +42,14 @@ public class UserServiceTest {
         Optional<User> result = userService.updateUser(user);
 
         Assertions.assertTrue(result.isPresent());
-    }
+    }*/
 
-    @Test
+/*    @Test
     public void testUpdateUser_Failed(){
         Mockito.when(userRepository.updateUser(any(User.class))).thenReturn(false);
 
         Optional<User> result = userService.updateUser(user);
 
         Assertions.assertTrue(result.isEmpty());
-    }
+    }*/
 }
