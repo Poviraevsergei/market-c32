@@ -1,12 +1,17 @@
 package com.tms.model;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.SequenceGenerator;
@@ -30,11 +35,18 @@ public class Security {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @JsonIgnore
     @Column(name = "created", updatable = false)
     private Timestamp created;
 
+    @JsonIgnore
     @Column(name = "updated", insertable = false)
     private Timestamp updated;
+
+    @JsonBackReference
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @PrePersist
     protected void onCreate() {
@@ -46,6 +58,14 @@ public class Security {
         updated = new Timestamp(System.currentTimeMillis());
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     @Override
     public String toString() {
         return "Security{" +
@@ -55,7 +75,6 @@ public class Security {
                 ", role=" + role +
                 ", created=" + created +
                 ", updated=" + updated +
-                ", userId=" + userId +
                 '}';
     }
 
@@ -64,17 +83,14 @@ public class Security {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Security security = (Security) o;
-        return Objects.equals(id, security.id) && Objects.equals(login, security.login) && Objects.equals(password, security.password) && role == security.role && Objects.equals(created, security.created) && Objects.equals(updated, security.updated) && Objects.equals(userId, security.userId);
+        return Objects.equals(id, security.id) && Objects.equals(login, security.login) && Objects.equals(password, security.password) && role == security.role && Objects.equals(created, security.created) && Objects.equals(updated, security.updated);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, login, password, role, created, updated, userId);
+        return Objects.hash(id, login, password, role, created, updated);
     }
-
-    @Column(name = "user_id")
-    private Long userId;
-
+    
     public Long getId() {
         return id;
     }
@@ -121,13 +137,5 @@ public class Security {
 
     public void setUpdated(Timestamp updated) {
         this.updated = updated;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
     }
 }

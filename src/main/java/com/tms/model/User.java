@@ -1,17 +1,25 @@
 package com.tms.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Transient;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
+import java.util.HashSet;
+import java.util.Set;
 
 @Scope("prototype")
 @Component
@@ -31,11 +39,27 @@ public class User {
     @Column(name = "telephone_number")
     private String telephoneNumber;
 
+    @JsonIgnore
     @Column(name = "created", updatable = false)
     private Timestamp created;
 
+    @JsonIgnore
     @Column(name = "updated", insertable = false)
     private Timestamp updated;
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+    
+    @JsonManagedReference
+    @OneToOne(mappedBy = "user")
+    private Security security;
+
+    @JsonManagedReference
+    @JoinTable(name = "l_users_product", 
+            joinColumns = @JoinColumn(name = "user_id"), 
+            inverseJoinColumns = @JoinColumn(name = "product_id"))
+    @ManyToMany(fetch = FetchType.LAZY)
+    private Set<Product> products = new HashSet<>();
 
     @PrePersist
     protected void onCreate() {
@@ -46,12 +70,6 @@ public class User {
     protected void onUpdate() {
         updated = new Timestamp(System.currentTimeMillis());
     }
-
-    @Column(name = "is_deleted")
-    private Boolean isDeleted;
-    
-    @Transient
-    private Security securityInfo;
 
     @Override
     public String toString() {
@@ -66,8 +84,15 @@ public class User {
                 ", created=" + created +
                 ", updated=" + updated +
                 ", isDeleted=" + isDeleted +
-                ", securityInfo=" + securityInfo +
                 '}';
+    }
+
+    public Set<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(Set<Product> products) {
+        this.products = products;
     }
 
     public Long getId() {
@@ -150,11 +175,11 @@ public class User {
         isDeleted = deleted;
     }
 
-    public Security getSecurityInfo() {
-        return securityInfo;
+    public Security getSecurity() {
+        return security;
     }
 
-    public void setSecurityInfo(Security securityInfo) {
-        this.securityInfo = securityInfo;
+    public void setSecurity(Security security) {
+        this.security = security;
     }
 }

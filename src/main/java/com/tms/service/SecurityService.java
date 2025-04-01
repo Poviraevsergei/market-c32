@@ -9,14 +9,13 @@ import com.tms.repository.SecurityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.security.auth.login.LoginException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Optional;
 
 @Component
 public class SecurityService {
-    
+
     private User user;
     private Security security;
     private final SecurityRepository securityRepository;
@@ -27,10 +26,14 @@ public class SecurityService {
         this.user = user;
         this.security = security;
     }
-    
+
+    public Optional<Security> getSecurityById(Long id) {
+        return securityRepository.getSecurityById(id);
+    }
+
     public Optional<User> registration(RegistrationRequestDto requestDto) throws LoginUsedException {
         try {
-            if (securityRepository.isLoginUsed(requestDto.getLogin())){
+            if (securityRepository.isLoginUsed(requestDto.getLogin())) {
                 throw new LoginUsedException(requestDto.getLogin());
             }
             user.setFirstname(requestDto.getFirstname());
@@ -41,7 +44,7 @@ public class SecurityService {
             user.setSex(requestDto.getSex());
             user.setTelephoneNumber(requestDto.getTelephoneNumber());
             user.setDeleted(false);
-            
+
             security.setLogin(requestDto.getLogin());
             security.setPassword(requestDto.getPassword());
             security.setRole(Role.USER);

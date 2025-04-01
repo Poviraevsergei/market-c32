@@ -30,7 +30,6 @@ public class SecurityRepository {
         try {
             entityManager.getTransaction().begin();
             entityManager.persist(user);
-            security.setUserId(user.getId());
             entityManager.persist(security);
             entityManager.getTransaction().commit();
             return Optional.of(entityManager.find(User.class, user.getId()));
@@ -45,5 +44,9 @@ public class SecurityRepository {
         Query query = entityManager.createNativeQuery(SQLQuery.GET_SECURITY_BY_LOGIN, Security.class);
         query.setParameter("login", login);
         return query.getSingleResultOrNull() != null;
+    }
+
+    public Optional<Security> getSecurityById(Long id) {
+        return Optional.of(entityManager.find(Security.class, id));
     }
 }

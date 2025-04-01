@@ -1,6 +1,7 @@
 package com.tms.controller;
 
 import com.tms.exception.LoginUsedException;
+import com.tms.model.Security;
 import com.tms.model.User;
 import com.tms.model.dto.RegistrationRequestDto;
 import com.tms.service.SecurityService;
@@ -10,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,5 +43,14 @@ public class SecurityController {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
         return new ResponseEntity<>(user.get(), HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Security> getSecurityById(@PathVariable("id") Long id) {
+        Optional<Security> security = securityService.getSecurityById(id);
+        if (security.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(security.get(), HttpStatus.OK);
     }
 }

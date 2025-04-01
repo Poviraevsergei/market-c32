@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -29,7 +30,7 @@ public class UserController {
     public UserController(UserService userService) {
         this.userService = userService;
     }
-    
+
     @ApiResponses(value = {
             @ApiResponse(description = "When user created.", responseCode = "201"),
             @ApiResponse(description = "When something wrong.", responseCode = "409")
@@ -42,7 +43,7 @@ public class UserController {
         }
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
-    
+
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable("id") @Parameter(description = "User id") Long id) {
         Optional<User> user = userService.getUserById(id);
@@ -51,7 +52,7 @@ public class UserController {
         }
         return new ResponseEntity<>(user.get(), HttpStatus.OK);
     }
-    
+
     @PutMapping
     public ResponseEntity<User> updateUser(@RequestBody User user) {
         Optional<User> userUpdated = userService.updateUser(user);
@@ -59,6 +60,15 @@ public class UserController {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
         return new ResponseEntity<>(userUpdated.get(), HttpStatus.OK);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<User>> getAllUsers() {
+        List<User> users = userService.getAllUsers();
+        if (users.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
