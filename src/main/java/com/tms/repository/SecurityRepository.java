@@ -32,7 +32,7 @@ public class SecurityRepository {
             entityManager.persist(user);
             entityManager.persist(security);
             entityManager.getTransaction().commit();
-            return Optional.of(entityManager.find(User.class, user.getId()));
+            return Optional.of(user);
         } catch (Exception e) {
             entityManager.getTransaction().rollback();
             log.error(e.getMessage());

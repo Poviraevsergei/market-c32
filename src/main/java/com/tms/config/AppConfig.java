@@ -35,7 +35,7 @@ public class AppConfig implements WebMvcConfigurer {
     public EntityManagerFactory entityManagerFactory() {
         return Persistence.createEntityManagerFactory("default");
     }
-
+    
     @Bean
     public EntityManager entityManager() {
         return entityManagerFactory().createEntityManager();

@@ -1,7 +1,9 @@
 package com.tms.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -44,7 +46,7 @@ public class User {
     private Timestamp created;
 
     @JsonIgnore
-    @Column(name = "updated", insertable = false)
+    @Column(name = "updated")
     private Timestamp updated;
 
     @Column(name = "is_deleted")
@@ -53,8 +55,7 @@ public class User {
     @JsonManagedReference
     @OneToOne(mappedBy = "user")
     private Security security;
-
-    @JsonManagedReference
+    
     @JoinTable(name = "l_users_product", 
             joinColumns = @JoinColumn(name = "user_id"), 
             inverseJoinColumns = @JoinColumn(name = "product_id"))
@@ -64,6 +65,7 @@ public class User {
     @PrePersist
     protected void onCreate() {
         created = new Timestamp(System.currentTimeMillis());
+        updated = new Timestamp(System.currentTimeMillis());
     }
 
     @PreUpdate

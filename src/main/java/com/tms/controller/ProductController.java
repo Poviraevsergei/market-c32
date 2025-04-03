@@ -35,6 +35,15 @@ public class ProductController {
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
+    @PostMapping("/{userId}/{productId}")
+    public ResponseEntity<HttpStatus> addProductByUser(@PathVariable("userId") Long userId, @PathVariable("productId") Long productId) {
+        Boolean result = productService.addProductByUser(userId, productId);
+        if (!result) {
+            return new ResponseEntity<>(HttpStatus.CONFLICT);
+        }
+        return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<Product> getProductById(@PathVariable("id") Long id) {
         Optional<Product> product = productService.getProductById(id);

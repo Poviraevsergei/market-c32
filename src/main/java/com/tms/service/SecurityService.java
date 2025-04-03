@@ -44,10 +44,12 @@ public class SecurityService {
             user.setSex(requestDto.getSex());
             user.setTelephoneNumber(requestDto.getTelephoneNumber());
             user.setDeleted(false);
+            user.setSecurity(security);
 
             security.setLogin(requestDto.getLogin());
             security.setPassword(requestDto.getPassword());
             security.setRole(Role.USER);
+            security.setUser(user);
             return securityRepository.registration(user, security);
         } catch (SQLException e) {
             System.out.println(e.getMessage());

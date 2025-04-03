@@ -21,5 +21,5 @@ public class Main {
         SpringApplication.run(Main.class, args);
     }
     
-    //TODO: FetchType=LAZY ??
+    //TODO: 1. Hibernate check! FetchType=LAZY??
 }

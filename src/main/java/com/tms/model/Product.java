@@ -38,12 +38,13 @@ public class Product {
     private Timestamp created;
 
     @JsonIgnore
-    @Column(name = "updated", insertable = false)
+    @Column(name = "updated")
     private Timestamp updated;
 
     @PrePersist
     protected void onCreate() {
         created = new Timestamp(System.currentTimeMillis());
+        updated = new Timestamp(System.currentTimeMillis());
     }
 
     @PreUpdate

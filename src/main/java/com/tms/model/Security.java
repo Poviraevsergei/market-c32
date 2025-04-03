@@ -40,7 +40,7 @@ public class Security {
     private Timestamp created;
 
     @JsonIgnore
-    @Column(name = "updated", insertable = false)
+    @Column(name = "updated")
     private Timestamp updated;
 
     @JsonBackReference
@@ -51,6 +51,7 @@ public class Security {
     @PrePersist
     protected void onCreate() {
         created = new Timestamp(System.currentTimeMillis());
+        updated = new Timestamp(System.currentTimeMillis());
     }
 
     @PreUpdate

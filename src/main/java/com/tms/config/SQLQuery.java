@@ -9,6 +9,7 @@ public interface SQLQuery {
             "VALUES (DEFAULT, ?, ?, ?, ?, ?, DEFAULT, ?, ?, ?)";
     String CREATE_SECURITY = "INSERT INTO security (id, login, password, role, created, updated, user_id) " +
             "VALUES (DEFAULT, ?, ?, ?, DEFAULT, ?, ?)";
+    String ADD_PRODUCT_BY_USER = "INSERT INTO l_users_product (product_id, user_id) VALUES (?, ?)";
 }
 
 

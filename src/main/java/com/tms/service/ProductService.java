@@ -24,6 +24,10 @@ public class ProductService {
     public Optional<Product> getProductById(Long id) {
         return productRepository.getProductById(id);
     }
+    
+    public Boolean addProductByUser(Long userId, Long productId) {
+        return productRepository.addProductByUser(userId, productId);
+    }
 
     public Optional<Product> updateProduct(Product product) {
         return productRepository.updateProduct(product);

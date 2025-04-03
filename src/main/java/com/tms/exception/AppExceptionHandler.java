@@ -1,5 +1,6 @@
 package com.tms.exception;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,5 +30,11 @@ public class AppExceptionHandler {
     public ResponseEntity<String> loginUsedExceptionHandler(LoginUsedException exception) {
         log.error(exception.getMessage());
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST) ;
+    }
+
+    @ExceptionHandler(value = EntityNotFoundException.class)
+    public ResponseEntity<String> EntityNotFoundExceptionExceptionHandler(EntityNotFoundException exception) {
+        log.error(exception.getMessage());
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND) ;
     }
 }
