@@ -1,0 +1,23 @@
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+
+        <property name="connection.url">jdbc:postgresql://localhost/database-32</property>
+        <property name="connection.driver_class">org.postgresql.Driver</property>
+        <property name="connection.username">user32</property>
+        <property name="connection.password">qwerty</property>
+
+        <property name="dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+        <property name="hbm2ddl.auto">none</property>
+
+        <property name="show_sql">true</property>
+        <property name="format_sql">true</property>
+
+        <mapping class="com.tms.model.User"/>
+        <mapping class="com.tms.model.Product"/>
+        <mapping class="com.tms.model.Security"/>
+    </session-factory>
+</hibernate-configuration>

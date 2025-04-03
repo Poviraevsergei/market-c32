@@ -1,10 +1,9 @@
 package com.tms.repository;
 
-
 import com.tms.model.User;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
+import org.hibernate.Session;
 import jakarta.persistence.EntityNotFoundException;
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,28 +15,30 @@ import java.util.Optional;
 @Repository
 public class UserRepository {
     
-    public EntityManager entityManager;
+    public Session session;
+    public SessionFactory sessionFactory;
     private static final Logger log = LoggerFactory.getLogger(UserRepository.class);
 
     @Autowired
-    public UserRepository(EntityManager entityManager) {
-        this.entityManager = entityManager;
+    public UserRepository(Session session, SessionFactory sessionFactory) {
+        this.session = session;
+        this.sessionFactory = sessionFactory;
     }
 
     public Optional<User> getUserById(Long id) {
-        entityManager.clear();
-        return Optional.of(entityManager.find(User.class, id));
+        Session sessionOne = sessionFactory.openSession();
+        Optional<User> userOpt = Optional.of(session.find(User.class, id));
+        sessionOne.close();
+        return userOpt;
     }
-
     
     public Boolean deleteUser(Long id) {
         try {
-            
-            entityManager.getTransaction().begin();
-            entityManager.remove(entityManager.find(User.class, id));
-            entityManager.getTransaction().commit();
+            session.getTransaction().begin();
+            session.remove(session.find(User.class, id));
+            session.getTransaction().commit();
         } catch (Exception e) {
-            entityManager.getTransaction().rollback();
+            session.getTransaction().rollback();
             log.error(e.getMessage());
             return false;
         }
@@ -46,11 +47,11 @@ public class UserRepository {
 
     public Boolean createUser(User user) {
         try {
-            entityManager.getTransaction().begin();
-            entityManager.persist(user); 
-            entityManager.getTransaction().commit();
+            session.getTransaction().begin();
+            session.persist(user); 
+            session.getTransaction().commit();
         } catch (Exception e) {
-            entityManager.getTransaction().rollback();
+            session.getTransaction().rollback();
             log.error(e.getMessage());
             return false;
         }
@@ -58,11 +59,11 @@ public class UserRepository {
     }
     
     public List<User> getAllUsers(){
-        return entityManager.createQuery("from users").getResultList();
+        return session.createQuery("from users").getResultList();
     }
 
     public Optional<User> updateUser(User user) {
-        User existingUser = entityManager.find(User.class, user.getId());
+        User existingUser = session.find(User.class, user.getId());
         
         if (existingUser == null) {
             throw new EntityNotFoundException("User with id " + user.getId() + " not found");
@@ -77,11 +78,11 @@ public class UserRepository {
         existingUser.setEmail(user.getEmail());
         
         try {
-            entityManager.getTransaction().begin();
-            entityManager.merge(existingUser);
-            entityManager.getTransaction().commit();
+            session.getTransaction().begin();
+            session.merge(existingUser);
+            session.getTransaction().commit();
         } catch (Exception e) {
-            entityManager.getTransaction().rollback();
+            session.getTransaction().rollback();
             log.error(e.getMessage());
         }
         return Optional.of(existingUser);
