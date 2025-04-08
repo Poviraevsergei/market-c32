@@ -30,7 +30,7 @@ public class Product {
     private Double price;
 
     @JsonBackReference
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "products")
+    @ManyToMany(mappedBy = "products", fetch = FetchType.EAGER)
     private Set<User> users = new HashSet<>();
     
     @JsonIgnore

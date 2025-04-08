@@ -60,7 +60,7 @@ public class User {
     @JoinTable(name = "l_users_product", 
             joinColumns = @JoinColumn(name = "user_id"), 
             inverseJoinColumns = @JoinColumn(name = "product_id"))
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.EAGER)
     private Set<Product> products = new HashSet<>();
 
     @PrePersist
