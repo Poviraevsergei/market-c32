@@ -28,14 +28,4 @@ public class AppConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(logInterceptor).addPathPatterns("/**");
     }
-
-    @Bean
-    public SessionFactory initSessionFactory() {
-        return new org.hibernate.cfg.Configuration().configure().buildSessionFactory();
-    }
-    
-    @Bean
-    public Session initSession() {
-        return initSessionFactory().openSession();
-    }
 }

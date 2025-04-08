@@ -28,14 +28,16 @@ public class SecurityService {
     }
 
     public Optional<Security> getSecurityById(Long id) {
-        return securityRepository.getSecurityById(id);
+        return securityRepository.findById(id);
     }
 
     public Optional<User> registration(RegistrationRequestDto requestDto) throws LoginUsedException {
-        try {
-            if (securityRepository.isLoginUsed(requestDto.getLogin())) {
-                throw new LoginUsedException(requestDto.getLogin());
-            }
+
+        if (securityRepository.existsByLogin(requestDto.getLogin())) {
+            throw new LoginUsedException(requestDto.getLogin());
+        }
+        /*        try {
+            
             user.setFirstname(requestDto.getFirstname());
             user.setSecondName(requestDto.getSecondName());
             user.setEmail(requestDto.getEmail());
@@ -54,6 +56,7 @@ public class SecurityService {
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             return Optional.empty();
-        }
+        }*/
+        return Optional.ofNullable(null);
     }
 }
