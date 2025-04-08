@@ -1,11 +1,14 @@
 package com.tms.repository;
 
 import com.tms.model.User;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaDelete;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.CriteriaUpdate;
+import jakarta.persistence.criteria.Root;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.query.MutationQuery;
-import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,12 +19,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import static com.tms.config.SQLQuery.COPY_USER_HQL;
-import static com.tms.config.SQLQuery.DELETE_BY_ID_HQL;
-import static com.tms.config.SQLQuery.FIND_ALL_HQL;
-import static com.tms.config.SQLQuery.FIND_BY_ID_HQL;
-import static com.tms.config.SQLQuery.UPDATE_USER_BY_ID_HQL;
 
 @Repository
 public class UserRepository {
@@ -37,9 +34,19 @@ public class UserRepository {
     public Optional<User> getUserById(Long id) {
         User user = null;
         try (Session session = sessionFactory.openSession()) {
-            Query<User> query = session.createQuery(FIND_BY_ID_HQL, User.class);
-            query.setParameter("userId", id);
-            user = query.getSingleResult();
+            //Создаем CriteriaBuilder
+            CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+
+            //Создаем CriteriaQuery
+            CriteriaQuery<User> criteriaQuery = criteriaBuilder.createQuery(User.class);
+
+            //Корень запроса
+            Root<User> root = criteriaQuery.from(User.class);
+
+            criteriaQuery.select(root).where(criteriaBuilder.equal(root.get("id"), id));
+
+            //Выполняем запрос
+            user = session.createQuery(criteriaQuery).getSingleResult();
         } catch (Exception e) {
             log.error(e.getMessage());
         }
@@ -47,54 +54,70 @@ public class UserRepository {
     }
 
     public List<User> getAllUsers() {
+        List<User> users = new ArrayList<>();
         try (Session session = sessionFactory.openSession()) {
-            return session.createQuery(FIND_ALL_HQL, User.class).getResultList();
+            CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+            CriteriaQuery<User> criteriaQuery = criteriaBuilder.createQuery(User.class);
+            Root<User> root = criteriaQuery.from(User.class);
+
+            criteriaQuery.select(root);
+
+            users = session.createQuery(criteriaQuery).getResultList();
         } catch (Exception e) {
             log.error(e.getMessage());
         }
-        return new ArrayList<>();
+        return users;
     }
 
     public Boolean deleteUser(Long id) {
         Transaction transaction = null;
+        boolean isDeleted = false;
         try (Session session = sessionFactory.openSession()) {
-            MutationQuery query = session.createMutationQuery(DELETE_BY_ID_HQL);
-            query.setParameter("id", id);
+            CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+            CriteriaDelete<User> criteriaQuery = criteriaBuilder.createCriteriaDelete(User.class);
+            Root<User> root = criteriaQuery.from(User.class);
+
+            criteriaQuery.where(criteriaBuilder.equal(root.get("id"), id));
+
             transaction = session.beginTransaction();
-            query.executeUpdate();
+            int affectedRows = session.createMutationQuery(criteriaQuery).executeUpdate();
             transaction.commit();
+            isDeleted = affectedRows > 0;
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
             }
             log.error(e.getMessage());
-            return false;
         }
-        return true;
+        return isDeleted;
     }
 
     public Optional<User> updateUser(User user) {
         Transaction transaction = null;
         User userUpdated = null;
         try (Session session = sessionFactory.openSession()) {
-            MutationQuery query = session.createMutationQuery(UPDATE_USER_BY_ID_HQL);
-            query.setParameter("firstname", user.getFirstname());
-            query.setParameter("secondName", user.getSecondName());
-            query.setParameter("age", user.getAge());
-            query.setParameter("email", user.getEmail());
-            query.setParameter("sex", user.getSex());
-            query.setParameter("telephoneNumber", user.getTelephoneNumber());
-            query.setParameter("updated", Timestamp.valueOf(LocalDateTime.now()));
-            query.setParameter("isDeleted", user.getDeleted());
-            query.setParameter("id", user.getId());
+            CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
+            CriteriaUpdate<User> criteriaQuery = criteriaBuilder.createCriteriaUpdate(User.class);
+            Root<User> root = criteriaQuery.from(User.class);
+
+            criteriaQuery.set(root.get("firstname"), user.getFirstname());
+            criteriaQuery.set(root.get("secondName"), user.getSecondName());
+            criteriaQuery.set(root.get("age"), user.getAge());
+            criteriaQuery.set(root.get("email"), user.getEmail());
+            criteriaQuery.set(root.get("sex"), user.getSex());
+            criteriaQuery.set(root.get("telephoneNumber"), user.getTelephoneNumber());
+            criteriaQuery.set(root.get("updated"), Timestamp.valueOf(LocalDateTime.now()));
+            criteriaQuery.set(root.get("isDeleted"), user.getDeleted());
+
+            criteriaQuery.where(criteriaBuilder.equal(root.get("id"), user.getId()));
 
             transaction = session.beginTransaction();
-            query.executeUpdate();
+            int affectedRows = session.createMutationQuery(criteriaQuery).executeUpdate();
             transaction.commit();
 
-            Query<User> queryFindUser = session.createQuery(FIND_BY_ID_HQL, User.class);
-            queryFindUser.setParameter("userId", user.getId());
-            userUpdated = queryFindUser.getSingleResult();
+            if (affectedRows > 0) {
+                userUpdated = user;
+            }
         } catch (Exception e) {
             if (transaction != null) {
                 transaction.rollback();
@@ -105,14 +128,13 @@ public class UserRepository {
     }
 
     public Boolean createUser(User user) {
-        /* Не предназначен для добавления строк в БД(кроме копирования из 1 таблицы в 2*) */
+        /* Не предназначен для добавления строк в БД*/
 
         Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            Query<User> query = session.createQuery(COPY_USER_HQL, User.class);
-            query.setParameter("id", user.getId());
-            query.executeUpdate();
+            transaction = session.getTransaction();
+            transaction.begin();
+            session.persist(user);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
