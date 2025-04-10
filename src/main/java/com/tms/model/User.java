@@ -50,16 +50,6 @@ public class User {
     @Column(name = "is_deleted")
     private Boolean isDeleted;
     
-    @JsonManagedReference
-    @OneToOne(mappedBy = "user")
-    private Security security;
-    
-    @JoinTable(name = "l_users_product", 
-            joinColumns = @JoinColumn(name = "user_id"), 
-            inverseJoinColumns = @JoinColumn(name = "product_id"))
-    @ManyToMany(fetch = FetchType.EAGER)
-    private Set<Product> products = new HashSet<>();
-
     @PrePersist
     protected void onCreate() {
         created = new Timestamp(System.currentTimeMillis());
@@ -85,14 +75,6 @@ public class User {
                 ", updated=" + updated +
                 ", isDeleted=" + isDeleted +
                 '}';
-    }
-
-    public Set<Product> getProducts() {
-        return products;
-    }
-
-    public void setProducts(Set<Product> products) {
-        this.products = products;
     }
 
     public Long getId() {
@@ -174,14 +156,4 @@ public class User {
     public void setDeleted(Boolean deleted) {
         isDeleted = deleted;
     }
-
-    public Security getSecurity() {
-        return security;
-    }
-
-    public void setSecurity(Security security) {
-        this.security = security;
-    }
-
-
 }

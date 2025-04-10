@@ -38,19 +38,8 @@ public class ProductService {
         return productRepository.findById(id);
     }
 
-/*    public Boolean addProductByUser(Long userId, Long productId) {
-        return productRepository.addProductToUser(userId, productId) > 0;
-    }*/
-
     public Boolean addProductByUser(Long userId, Long productId) {
-        Optional<Product> product = productRepository.findById(productId);
-        Optional<User> user = userRepository.findById(userId);
-        if (product.isPresent() && user.isPresent()) {
-            user.get().getProducts().add(product.get());
-            userRepository.save(user.get());
-            return true;
-        }
-        return false;
+        return productRepository.addProductToUser(userId, productId) > 0;
     }
 
     public Optional<Product> updateProduct(Product product) {

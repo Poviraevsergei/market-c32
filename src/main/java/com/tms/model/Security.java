@@ -43,10 +43,8 @@ public class Security {
     @Column(name = "updated")
     private Timestamp updated;
 
-    @JsonBackReference
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "user_id")
+    private Long userId;
 
     @PrePersist
     protected void onCreate() {
@@ -59,39 +57,6 @@ public class Security {
         updated = new Timestamp(System.currentTimeMillis());
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    @Override
-    public String toString() {
-        return "Security{" +
-                "id=" + id +
-                ", login='" + login + '\'' +
-                ", password='" + password + '\'' +
-                ", role=" + role +
-                ", created=" + created +
-                ", updated=" + updated +
-                '}';
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Security security = (Security) o;
-        return Objects.equals(id, security.id) && Objects.equals(login, security.login) && Objects.equals(password, security.password) && role == security.role && Objects.equals(created, security.created) && Objects.equals(updated, security.updated);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, login, password, role, created, updated);
-    }
-    
     public Long getId() {
         return id;
     }
@@ -138,5 +103,39 @@ public class Security {
 
     public void setUpdated(Timestamp updated) {
         this.updated = updated;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    @Override
+    public String toString() {
+        return "Security{" +
+                "id=" + id +
+                ", login='" + login + '\'' +
+                ", password='" + password + '\'' +
+                ", role=" + role +
+                ", created=" + created +
+                ", updated=" + updated +
+                ", userId=" + userId +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Security security = (Security) o;
+        return Objects.equals(id, security.id) && Objects.equals(login, security.login) && Objects.equals(password, security.password) && role == security.role && Objects.equals(created, security.created) && Objects.equals(updated, security.updated) && Objects.equals(userId, security.userId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, login, password, role, created, updated, userId);
     }
 }

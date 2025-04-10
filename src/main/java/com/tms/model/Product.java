@@ -28,10 +28,6 @@ public class Product {
     private Integer id;
     private String name;
     private Double price;
-
-    @JsonBackReference
-    @ManyToMany(mappedBy = "products", fetch = FetchType.EAGER)
-    private Set<User> users = new HashSet<>();
     
     @JsonIgnore
     @Column(name = "created", updatable = false)
@@ -50,14 +46,6 @@ public class Product {
     @PreUpdate
     protected void onUpdate() {
         updated = new Timestamp(System.currentTimeMillis());
-    }
-
-    public Set<User> getUsers() {
-        return users;
-    }
-
-    public void setUsers(Set<User> users) {
-        this.users = users;
     }
 
     public Integer getId() {
