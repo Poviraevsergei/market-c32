@@ -20,6 +20,4 @@ public class Main {
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
     }
-    
-    //TODO: 1. Hibernate check! FetchType=LAZY??
 }
