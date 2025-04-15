@@ -30,6 +30,8 @@ public class Security {
     @GeneratedValue(generator = "sec_seq_gen")
     private Long id;
     private String login;
+    
+    @JsonIgnore
     private String password;
 
     @Enumerated(EnumType.STRING)

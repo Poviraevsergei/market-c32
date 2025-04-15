@@ -8,6 +8,9 @@ import com.tms.model.dto.RegistrationRequestDto;
 import com.tms.repository.SecurityRepository;
 import com.tms.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,17 +23,23 @@ public class SecurityService {
     private User user;
     private Security security;
     private final SecurityRepository securityRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public SecurityService(SecurityRepository securityRepository, User user, Security security, UserRepository userRepository) {
+    public SecurityService(SecurityRepository securityRepository, User user, Security security, UserRepository userRepository
+    , PasswordEncoder passwordEncoder) {
         this.securityRepository = securityRepository;
         this.user = user;
         this.security = security;
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public Optional<Security> getSecurityById(Long id) {
-        return securityRepository.findById(id);
+        if (canAccessSecurity(id)){
+            return securityRepository.findById(id);
+        }
+        throw new AccessDeniedException("Access denied login:" + SecurityContextHolder.getContext().getAuthentication().getName() + " by id " + user.getId());
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -49,10 +58,30 @@ public class SecurityService {
         User userUpdated = userRepository.save(user);
 
         security.setLogin(requestDto.getLogin());
-        security.setPassword(requestDto.getPassword());
+        security.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         security.setRole(Role.USER);
         security.setUserId(userUpdated.getId());
         securityRepository.save(security);
         return userRepository.findById(userUpdated.getId());
+    }
+    
+    public boolean canAccessUser(Long userId) {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<Security> securityOptional = securityRepository.findByLogin(login);
+        if (securityOptional.isEmpty()) {
+            return false;
+        }
+        Security security = securityOptional.get();
+        return security.getRole().equals(Role.ADMIN) || security.getUserId().equals(userId);
+    }
+
+    public boolean canAccessSecurity(Long securityId) {
+        String login = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<Security> securityOptional = securityRepository.findByLogin(login);
+        if (securityOptional.isEmpty()) {
+            return false;
+        }
+        Security security = securityOptional.get();
+        return security.getRole().equals(Role.ADMIN) || security.getId().equals(securityId);
     }
 }

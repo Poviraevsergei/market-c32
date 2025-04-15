@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -33,8 +34,14 @@ public class AppExceptionHandler {
     }
 
     @ExceptionHandler(value = EntityNotFoundException.class)
-    public ResponseEntity<String> EntityNotFoundExceptionExceptionHandler(EntityNotFoundException exception) {
+    public ResponseEntity<String> entityNotFoundExceptionExceptionHandler(EntityNotFoundException exception) {
         log.error(exception.getMessage());
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND) ;
+    }
+
+    @ExceptionHandler(value = AccessDeniedException.class)
+    public ResponseEntity<String> accessDeniedExceptionHandler(AccessDeniedException exception) {
+        log.error(exception.getMessage());
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.FORBIDDEN) ;
     }
 }
