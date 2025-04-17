@@ -3,21 +3,22 @@ package com.tms.security;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 public class SpringSecurityConfiguration {
     
-    private CustomUserDetailService userDetailsService;
+    private JwtFilter jwtFilter;
 
     @Autowired
-    public SpringSecurityConfiguration(CustomUserDetailService userDetailsService) {
-        this.userDetailsService = userDetailsService;
+    public SpringSecurityConfiguration(JwtFilter jwtFilter) {
+        this.jwtFilter = jwtFilter;
     }
 
     @Bean
@@ -27,13 +28,14 @@ public class SpringSecurityConfiguration {
                 .authorizeHttpRequests(
                         requests -> requests
                                 .requestMatchers("/user", "PUT").hasAnyRole("ADMIN", "USER")
-                                .requestMatchers("/user", "GET").hasAnyRole("ADMIN")
-                                .requestMatchers("/user/**", "GET").hasAnyRole("ADMIN", "USER")
+                                .requestMatchers("/user", "GET").hasRole("ADMIN")
+                                .requestMatchers("/user/**", "GET").hasRole("ADMIN")
                                 .requestMatchers("/security/registration", "POST").permitAll()
+                                .requestMatchers("/security/token", "POST").permitAll()
                                 .anyRequest().authenticated()
                 )
-                .userDetailsService(userDetailsService)
-                .httpBasic(Customizer.withDefaults())
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }
 

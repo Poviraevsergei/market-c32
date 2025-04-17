@@ -1,5 +1,6 @@
 package com.tms.exception;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -30,18 +31,24 @@ public class AppExceptionHandler {
     @ExceptionHandler(value = LoginUsedException.class)
     public ResponseEntity<String> loginUsedExceptionHandler(LoginUsedException exception) {
         log.error(exception.getMessage());
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST) ;
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(value = EntityNotFoundException.class)
     public ResponseEntity<String> entityNotFoundExceptionExceptionHandler(EntityNotFoundException exception) {
         log.error(exception.getMessage());
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND) ;
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(value = AccessDeniedException.class)
     public ResponseEntity<String> accessDeniedExceptionHandler(AccessDeniedException exception) {
         log.error(exception.getMessage());
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.FORBIDDEN) ;
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(value = JwtException.class)
+    public ResponseEntity<String> jwtExceptionHandler(JwtException exception) {
+        log.error(exception.getMessage());
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.UNAUTHORIZED);
     }
 }

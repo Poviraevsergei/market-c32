@@ -3,6 +3,8 @@ package com.tms.controller;
 import com.tms.exception.LoginUsedException;
 import com.tms.model.Security;
 import com.tms.model.User;
+import com.tms.model.dto.AuthRequestDto;
+import com.tms.model.dto.AuthResponseDto;
 import com.tms.model.dto.RegistrationRequestDto;
 import com.tms.service.SecurityService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,5 +54,14 @@ public class SecurityController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>(security.get(), HttpStatus.OK);
+    }
+    
+    @PostMapping("/token")
+    public ResponseEntity<AuthResponseDto> generateToken(@RequestBody AuthRequestDto authRequestDto){
+        Optional<String> token = securityService.generateToken(authRequestDto);
+        if (token.isPresent()) {
+            return new ResponseEntity<>(new AuthResponseDto(token.get()), HttpStatus.CREATED);
+        }
+        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 }
