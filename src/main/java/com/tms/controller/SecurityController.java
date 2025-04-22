@@ -8,6 +8,7 @@ import com.tms.model.dto.AuthResponseDto;
 import com.tms.model.dto.RegistrationRequestDto;
 import com.tms.service.SecurityService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 
+@SecurityRequirement(name = "Bearer Authentication")
 @RestController
 @RequestMapping("/security")
 public class SecurityController {

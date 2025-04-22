@@ -2,6 +2,7 @@ package com.tms.controller;
 
 import com.tms.model.Product;
 import com.tms.service.ProductService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Optional;
 
+@SecurityRequirement(name = "Bearer Authentication")
 @RestController
 @RequestMapping("/product")
 public class ProductController {
