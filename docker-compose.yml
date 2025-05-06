@@ -24,8 +24,12 @@ services:
       - db
     networks:
       - backend
+    volumes:
+      - app_data:/c32/logs
       
 networks:
   backend:
     driver: bridge
   
+volumes:
+  app_data:
