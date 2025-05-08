@@ -4,6 +4,7 @@ import com.tms.model.Product;
 import com.tms.service.ProductService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Optional;
 
 @SecurityRequirement(name = "Bearer Authentication")
@@ -71,5 +73,25 @@ public class ProductController {
             return new ResponseEntity<>(HttpStatus.CONFLICT);
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/sort/{field}")
+    public ResponseEntity<List<Product>> getAllProductsWithSorting(@PathVariable("field") String field) {
+        List<Product> products = productService.getAllProductsWithSorting(field);
+        if (products.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
+
+    @GetMapping("/pagination/{page}/{size}")
+    public ResponseEntity<Page<Product>> getAllProductsWithSorting(
+            @PathVariable("page") Integer page,
+            @PathVariable("size") Integer size) {
+        Page<Product> products = productService.getProductsWithPagination(page, size);
+        if (products.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(products, HttpStatus.OK);
     }
 }

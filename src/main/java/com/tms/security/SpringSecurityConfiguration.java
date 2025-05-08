@@ -52,6 +52,8 @@ public class SpringSecurityConfiguration {
                                 .requestMatchers(new AntPathRequestMatcher("/security/registration", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/security/token", "POST")).permitAll()
                                 .requestMatchers(new AntPathRequestMatcher("/swagger-ui/**")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/product/sort/**", "GET")).permitAll()
+                                .requestMatchers(new AntPathRequestMatcher("/product/pagination/**", "GET")).permitAll()
                                 .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
