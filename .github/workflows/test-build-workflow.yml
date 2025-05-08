@@ -1,0 +1,27 @@
+name: test-build-workflow
+on:
+  push:
+
+jobs:
+  run-all-tests-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Start test and build
+        run: echo "Starting test/build ..."
+        
+      - name: Download project into ubuntu
+        uses: actions/checkout@v4
+        
+      - name: Setup java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+          
+      - name: Setup maven
+        uses: stCarolas/setup-maven@v4
+        with:
+          maven-version: 3.8.2
+          
+      - name: Run tests and build
+        run: mvn clean install
